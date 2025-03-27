@@ -2,15 +2,6 @@
 
 import { useState } from 'react' // Importa o hook useState do React
 
-const empresas = [
-  { id: 1, nome: '01-Jaboticabal', matriz: 1, filial: null },
-  { id: 2, nome: '03-Pradopolis', matriz: 3, filial: null },
-  { id: 3, nome: '04-Monte alto', matriz: 4, filial: null },
-  { id: 4, nome: '05-Guariba 2', matriz: 5, filial: null },
-  { id: 5, nome: '06-Jaboticabal', matriz: 6, filial: 1 },
-  { id: 6, nome: '06-Jaboticabal', matriz: 6, filial: null }
-]
-
 export default function Home() {
   const [file, setFile] = useState(null) // Cria um estado para armazenar o arquivo carregado
   const [fileName, setFileName] = useState('Selecione um arquivo')
@@ -19,7 +10,6 @@ export default function Home() {
   const [loja, setLoja] = useState('') // Cria um estado para armazenar o número da loja
   const [filial, setFilial] = useState('') // Cria um estado para armazenar o número da loja
   const [uniqueItems, setUniqueItems] = useState([]) // Cria um estado para armazenar os itens únicos
-  const [empresaSelecionada, setEmpresaSelecionada] = useState(null) // Estado da empresa selecionada
 
   // Função para manipular o upload de arquivos
   const handleFileUpload = e => {
@@ -32,16 +22,14 @@ export default function Home() {
     }
   }
 
-  // Função para manipular a mudança no select de empresa
-  const handleEmpresaChange = e => {
-    const idEmpresa = parseInt(e.target.value) // Obtém o ID da empresa
-    const empresa = empresas.find(emp => emp.id === idEmpresa) // Busca os dados da empresa no array
+  // Função para manipular a mudança no input da loja
+  const handleLojaChange = e => {
+    setLoja(e.target.value) // Atualiza o estado da loja com o valor digitado pelo usuário
+  }
 
-    if (empresa) {
-      setEmpresaSelecionada(empresa)
-      setLoja(empresa.matriz) // Atribui o valor da matriz à variável loja
-      setFilial(empresa.filial ? empresa.filial : null) // Atribui o valor da filial (ou vazio, se não existir)
-    }
+  // Função para manipular a mudança no input da filial
+  const handleFilialChange = e => {
+    setFilial(e.target.value) // Atualiza o estado da filial com o valor digitado pelo usuário
   }
 
   // Função para converter o arquivo TXT para CSV
@@ -88,9 +76,7 @@ export default function Home() {
         ? `Loja ${loja} Filial ${filial} ${arrayClean[0][0]} `
         : `Loja ${loja} ${arrayClean[0][0]}` // Gera o nome do arquivo com base na loja e na data
       setNomeArquivo(nomeArquivo) // Atualiza o estado do nome do arquivo
-      console.log(loja)
-      console.log(filial)
-      console.log(nomeArquivo)
+
       // Ordenando por valor
       arrayClean.sort((a, b) => a[2] - b[2]) // Ordena as linhas pelo valor para ficar mais fácil de ver se falta alguma entrada
 
@@ -147,26 +133,28 @@ export default function Home() {
           </label>
         </div>
         <div className="inputs">
-          {/* Select Único para Empresas */}
           <div className="field">
-            <select onChange={handleEmpresaChange} defaultValue="">
-              <option value="">Selecione uma empresa</option>
-              {empresas.map(empresa => (
-                <option key={empresa.id} value={empresa.id}>
-                  {empresa.nome}
-                </option>
-              ))}
-            </select>
+            <label>N° da empresa matriz:</label>
+            <input
+              type="text"
+              placeholder="Número da Loja Matriz"
+              value={loja}
+              onChange={handleLojaChange}
+            />
+          </div>
+          <div className="field">
+            <label>N° da empresa filial:</label>
+            <input
+              type="text"
+              placeholder="Número da Loja filial"
+              value={filial}
+              onChange={handleFilialChange}
+            />
           </div>
         </div>
         <button onClick={handleFileConvert} disabled={!file || !loja}>
           Converter
         </button>
-        {csvData && (
-          <>
-            <button onClick={handleDownload}>Baixar arquivo</button>
-          </>
-        )}
       </div>
       <div className="resultado">
         {uniqueItems.length > 0 && (
@@ -179,6 +167,7 @@ export default function Home() {
         )}
         {csvData && (
           <>
+            <button onClick={handleDownload}>Baixar CSV</button>
             <h2>Resultado:</h2>
             <pre>{csvData}</pre>
           </>
